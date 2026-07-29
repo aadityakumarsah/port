@@ -1,0 +1,34 @@
+@import "../styles/globals.css";
+
+@layer base {
+  :root {
+    @apply font-sans;
+  }
+
+  body {
+    @apply min-h-screen relative m-0 bg-black text-zinc-300;
+  }
+}
+
+@keyframes leaf-pop {
+  0% {
+    transform: translate(0, 0) scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(1) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+.leaf-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 50;
+  animation: leaf-pop 0.8s ease-out forwards;
+}
+
+@keyframes loader-fade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.3); }
+}
