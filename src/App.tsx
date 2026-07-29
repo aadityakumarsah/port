@@ -41,6 +41,7 @@ import esewaLogo from "./public/esewa.png";
 import wwfLogo from "./public/wwf.png";
 import bitsPilaniLogo from "./public/bitspilani.png";
 import arnikoLogo from "./public/arniko.png";
+import githubContrib from "./public/github-contribution.png";
 
 import "./index.css";
 
@@ -54,7 +55,6 @@ interface LeafParticle {
 }
 
 export function App() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [leaves, setLeaves] = useState<LeafParticle[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,10 +64,6 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
     const playClickSound = () => {
       try {
         const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
@@ -125,11 +121,9 @@ export function App() {
       }, 800);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("click", handleClick);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("click", handleClick);
     };
   }, []);
@@ -170,18 +164,10 @@ export function App() {
         </div>
       ))}
 
-      {/* Cursor Glow Animation */}
-      <div 
-        className="pointer-events-none fixed inset-0 z-30 transition duration-300 lg:absolute"
-        style={{
-          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(147, 51, 234, 0.08), transparent 80%)`
-        }}
-      />
-
-      {/* Background Gradients */}
+      {/* Background */}
       <div className="fixed inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#FF6600]/10 rounded-full blur-[120px] mix-blend-multiply" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-600/10 rounded-full blur-[120px] mix-blend-multiply" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-yellow-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-amber-600/10 rounded-full blur-[120px]" />
       </div>
 
       <div className="relative z-10 mx-auto min-h-screen max-w-3xl px-6 py-12 md:px-12 md:py-20 lg:py-24">
@@ -456,41 +442,21 @@ export function App() {
 
             </section>
 
-            {/* My Stacks */}
+            {/* GitHub Contribution */}
             <section className="scroll-mt-16 md:scroll-mt-24">
-              <div className="mb-6">
-                <h2 className="text-xl font-bold uppercase tracking-widest text-white">My Stacks</h2>
+              <div className="flex items-center gap-3 mb-6">
+                <GitBranch size={20} className="text-indigo-400" />
+                <h2 className="text-lg font-bold text-white">Contribution</h2>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { name: "System Design", dot: "bg-slate-400" },
-                  { name: "Distributed Systems", dot: "bg-zinc-400" },
-                  { name: "Redis", dot: "bg-red-500" },
-                  { name: "AWS", dot: "bg-amber-500" },
-                  { name: "TypeScript", dot: "bg-blue-500" },
-                  { name: "Java", dot: "bg-orange-500" },
-                  { name: "React", dot: "bg-cyan-400" },
-                  { name: "FastAPI", dot: "bg-teal-500" },
-                  { name: "Rust", dot: "bg-orange-600" },
-                  { name: "PostgreSQL", dot: "bg-blue-600" },
-                  { name: "Docker", dot: "bg-blue-500" },
-                  { name: "Linux", dot: "bg-yellow-500" },
-                  { name: "Microservices", dot: "bg-indigo-400" },
-                  { name: "REST API", dot: "bg-cyan-600" },
-                  { name: "DSA", dot: "bg-emerald-500" },
-                  { name: "Database Design", dot: "bg-blue-500" },
-                  { name: "Production Debugging", dot: "bg-red-600" },
-                  { name: "CI/CD", dot: "bg-sky-500" },
-                  { name: "Pinecone", dot: "bg-emerald-500" },
-                  { name: "AI Agents", dot: "bg-purple-500" },
-                ].map((skill) => (
-                  <span key={skill.name} className="inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium text-zinc-200 border border-zinc-700/50 bg-zinc-900/60 hover:bg-zinc-800 hover:border-zinc-600 hover:scale-105 transition-all duration-200">
-                    <span className={`inline-block h-2 w-2 rounded-full ${skill.dot} shadow-sm`} />
-                    {skill.name}
-                  </span>
-                ))}
-              </div>
+              <a href="https://github.com/aadityakumarsah" target="_blank" rel="noreferrer" className="block p-3 rounded-xl border-2 border-zinc-700/50 hover:border-indigo-500/50 bg-zinc-900/30 transition-all duration-300">
+                <img
+                  src={githubContrib}
+                  alt="GitHub Contribution"
+                  className="w-full rounded-lg"
+                />
+              </a>
             </section>
+
 
           </main>
           
