@@ -42,6 +42,9 @@ import wwfLogo from "./public/wwf.png";
 import bitsPilaniLogo from "./public/bitspilani.png";
 import arnikoLogo from "./public/arniko.png";
 import githubContrib from "./public/github-contribution.png";
+import hackClubLogo from "./public/hack-club.png";
+import insforgeLogo from "./public/insforge.png";
+import fossasiaLogo from "./public/fossasia.png";
 
 import "./index.css";
 
@@ -57,11 +60,19 @@ interface LeafParticle {
 export function App() {
   const [leaves, setLeaves] = useState<LeafParticle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fading, setFading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
+    const timer = setTimeout(() => setFading(true), 1000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (fading) {
+      const timer = setTimeout(() => setLoading(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [fading]);
 
   useEffect(() => {
     const playClickSound = () => {
@@ -131,7 +142,7 @@ export function App() {
   return (
     <>
       {loading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black transition-opacity duration-300 ${fading ? "opacity-0" : "opacity-100"}`}>
           <div className="relative flex items-center justify-center gap-3">
             <div className="absolute w-32 h-32 bg-indigo-500/30 rounded-full blur-3xl animate-pulse" />
             <span className="text-2xl font-bold text-zinc-300 animate-spin relative z-10">cool</span>
@@ -368,6 +379,14 @@ export function App() {
                   <span>Winner, Health Theme - <img src={openaiLogo} alt="OpenAI" className="h-3.5 w-3.5 inline align-middle" /><span className="font-bold text-white ml-1">OpenAI</span>{' '}Build Week (50,000 participants).</span>
                 </li>
                 <li className="flex items-start gap-3">
+                  <ChevronRight size={16} className="text-indigo-500 mt-1 shrink-0" />
+                  <span>Winner, Nepal's biggest fintech <img src={esewaLogo} alt="eSewa" className="h-3.5 w-3.5 inline align-middle rounded-sm" /><span className="text-white font-bold ml-1">eSewa</span> x <img src={wwfLogo} alt="WWF" className="h-3.5 w-3.5 inline align-middle rounded-sm" /><span className="text-white font-bold ml-1">WWF</span> Hackathon</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <ChevronRight size={16} className="text-indigo-500 mt-1 shrink-0" />
+                  <span>Organizer, Daydream Biratnagar (<img src={hackClubLogo} alt="Hack Club" className="h-3.5 w-3.5 inline align-middle rounded-sm" /><span className="text-white font-bold ml-1">Hack Club</span>).</span>
+                </li>
+                <li className="flex items-start gap-3">
                   <ChevronRight size={16} className="text-indigo-500 mt-1.5 shrink-0" />
                   <div>
                     <span className="font-semibold text-zinc-200">Open-source contributor:</span>
@@ -395,8 +414,13 @@ export function App() {
                         <a href="https://openclaw.ai" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">OpenClaw</a>
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={shipSecLogo} alt="ShipSec" className="h-4 w-4 rounded-sm" />
-                        <a href="https://shipsec.ai" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">ShipSec</a>
+                        <img src={insforgeLogo} alt="InsForge" className="h-4 w-4 rounded-sm" />
+                        <a href="https://insforge.dev" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">InsForge</a>
+                        <span className="inline-flex items-center gap-0.5 font-bold text-[#FF6600] text-xs"><img src={ycLogo} alt="YC" className="h-3 w-3" />P26</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 text-sm">
+                        <img src={fossasiaLogo} alt="FOSS Asia" className="h-4 w-4 rounded-sm" />
+                        <a href="https://fossasia.org" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">FOSS Asia</a>
                       </span>
                       <span className="inline-flex items-center gap-1.5 text-sm">
                         <img src={kiloCodeLogo} alt="KiloCode" className="h-4 w-4 rounded-sm" />
@@ -404,10 +428,6 @@ export function App() {
                       </span>
                     </div>
                   </div>
-                </li>
-                <li className="flex items-start gap-3">
-                  <ChevronRight size={16} className="text-indigo-500 mt-1 shrink-0" />
-                  <span>Winner, <img src={esewaLogo} alt="eSewa" className="h-3.5 w-3.5 inline align-middle rounded-sm" /><span className="text-white font-bold ml-1">eSewa</span> x <img src={wwfLogo} alt="WWF" className="h-3.5 w-3.5 inline align-middle rounded-sm" /><span className="text-white font-bold ml-1">WWF Hackathon</span>; Organizer, Daydream Biratnagar (Hack Club).</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <ChevronRight size={16} className="text-indigo-500 mt-1 shrink-0" />
@@ -463,11 +483,11 @@ export function App() {
           {/* Footer Contacts */}
           <footer className="mt-12 pt-8 border-t border-zinc-800 flex flex-col items-center justify-center gap-6 pb-12">
             <div className="flex flex-wrap justify-center gap-8 text-zinc-400 text-sm font-medium">
-              <a href="mailto:shahsudha259@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
+              <a href="mailto:aadityakumarsah259@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
                 <Mail size={18} />
-                <span>shahsudha259@gmail.com</span>
+                <span>aadityakumarsah259@gmail.com</span>
               </a>
-              <a href="tel:+9779827068776" className="flex items-center gap-2 hover:text-white transition-colors">
+              <a href="https://wa.me/9779827068776" className="flex items-center gap-2 hover:text-white transition-colors">
                 <Phone size={18} />
                 <span>+977 9827068776</span>
               </a>
