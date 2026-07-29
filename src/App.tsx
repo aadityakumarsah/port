@@ -138,13 +138,15 @@ export function App() {
     <>
       {loading && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="relative flex items-center justify-center">
+          <div className="relative flex items-center justify-center gap-3">
             <div className="absolute w-32 h-32 bg-indigo-500/30 rounded-full blur-3xl animate-pulse" />
+            <span className="text-2xl font-bold text-zinc-300 animate-spin relative z-10">cool</span>
             <img
               src={clickImage}
               alt="Loading"
               className="w-12 h-12 animate-spin relative z-10"
             />
+            <span className="text-2xl font-bold text-zinc-300 animate-spin relative z-10">cool</span>
           </div>
         </div>
       )}
