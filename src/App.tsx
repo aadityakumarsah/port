@@ -91,6 +91,7 @@ interface LeafParticle {
 
 export function App() {
   const [leaves, setLeaves] = useState<LeafParticle[]>([]);
+  const [bgLeaves, setBgLeaves] = useState<LeafParticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [fading, setFading] = useState(false);
 
@@ -210,6 +211,37 @@ export function App() {
     };
   }, []);
 
+  useEffect(() => {
+    const spawnBgLeaf = () => {
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.random() * 200 + 100;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance;
+      const rot = Math.random() * 720 - 360;
+      const duration = Math.random() * 6 + 6;
+
+      const leaf: LeafParticle = {
+        id: Date.now() + Math.random(),
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        tx: `${tx}px`,
+        ty: `${ty}px`,
+        rot: `${rot}deg`,
+        src: leafLogos[Math.floor(Math.random() * leafLogos.length)],
+      };
+
+      setBgLeaves(prev => [...prev, leaf]);
+
+      setTimeout(() => {
+        setBgLeaves(prev => prev.filter(l => l.id !== leaf.id));
+      }, duration * 1000);
+    };
+
+    const interval = setInterval(spawnBgLeaf, 800);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       {loading && (
@@ -229,6 +261,24 @@ export function App() {
       <div className={loading ? "hidden" : ""}>
       <div className="relative min-h-screen overflow-x-hidden bg-black text-zinc-300 font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
       
+      {/* Background Floating Logos */}
+      {bgLeaves.map(leaf => (
+        <div
+          key={leaf.id}
+          className="bg-leaf-particle"
+          style={{
+            left: leaf.x,
+            top: leaf.y,
+            '--tx': leaf.tx,
+            '--ty': leaf.ty,
+            '--rot': leaf.rot,
+            '--duration': `${leaf.id % 10 + 6}s`,
+          } as React.CSSProperties}
+        >
+          <img src={leaf.src} alt="" className="w-6 h-6 opacity-20" />
+        </div>
+      ))}
+
       {/* Leaf Animation */}
       {leaves.map(leaf => (
         <div
