@@ -48,6 +48,37 @@ import fossasiaLogo from "./public/fossasia.png";
 
 import "./index.css";
 
+const leafLogos = [
+  ycLogo,
+  shipdLogo,
+  echoLogo,
+  deltaLogo,
+  digitalNirmanLogo,
+  cogneeLogo,
+  mastraLogo,
+  modelenceLogo,
+  metaLogo,
+  openClawLogo,
+  shipSecLogo,
+  kiloCodeLogo,
+  openaiLogo,
+  lamdaLogo,
+  hermesLogo,
+  modelRouterLogo,
+  clarioLogo,
+  nagrikLogo,
+  esewaLogo,
+  wwfLogo,
+  bitsPilaniLogo,
+  arnikoLogo,
+  hackClubLogo,
+  insforgeLogo,
+  fossasiaLogo,
+  clickImage,
+];
+
+import "./index.css";
+
 interface LeafParticle {
   id: number;
   x: number;
@@ -55,6 +86,7 @@ interface LeafParticle {
   tx: string;
   ty: string;
   rot: string;
+  src: string;
 }
 
 export function App() {
@@ -122,6 +154,7 @@ export function App() {
           tx: `${tx}px`,
           ty: `${ty}px`,
           rot: `${rot}deg`,
+          src: leafLogos[Math.floor(Math.random() * leafLogos.length)],
         });
       }
       
@@ -132,10 +165,48 @@ export function App() {
       }, 800);
     };
 
+    let lastMove = 0;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const now = Date.now();
+      if (now - lastMove < 50) return;
+      lastMove = now;
+
+      const count = Math.floor(Math.random() * 2) + 1;
+      const newLeaves: LeafParticle[] = [];
+      const idPrefix = now;
+      
+      for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * 30 + 15;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+        const rot = Math.random() * 360;
+        
+        newLeaves.push({
+          id: idPrefix + i,
+          x: e.clientX,
+          y: e.clientY,
+          tx: `${tx}px`,
+          ty: `${ty}px`,
+          rot: `${rot}deg`,
+          src: leafLogos[Math.floor(Math.random() * leafLogos.length)],
+        });
+      }
+      
+      setLeaves(prev => [...prev, ...newLeaves]);
+      
+      setTimeout(() => {
+        setLeaves(prev => prev.filter(leaf => leaf.id < idPrefix || leaf.id >= idPrefix + count));
+      }, 800);
+    };
+
     window.addEventListener("click", handleClick);
+    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       window.removeEventListener("click", handleClick);
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 
@@ -158,7 +229,7 @@ export function App() {
       <div className={loading ? "hidden" : ""}>
       <div className="relative min-h-screen overflow-x-hidden bg-black text-zinc-300 font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
       
-      {/* Click Animation */}
+      {/* Leaf Animation */}
       {leaves.map(leaf => (
         <div
           key={leaf.id}
@@ -171,7 +242,7 @@ export function App() {
             '--rot': leaf.rot,
           } as React.CSSProperties}
         >
-          <img src={clickImage} alt="" className="w-6 h-6" />
+          <img src={leaf.src} alt="" className="w-6 h-6" />
         </div>
       ))}
 
