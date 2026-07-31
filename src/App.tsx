@@ -392,9 +392,46 @@ const AGENTS = [
   { name: "Pi", color: "#10b981" },
 ];
 
+const MESSAGES = [
+  "looking creative",
+  "nice stack",
+  "checking this out",
+  "LGTM",
+  "impressive",
+  "love the details",
+  "great UX",
+  "fast load time",
+  "solid architecture",
+];
+
 const AgentCursor = ({ name, color }: { name: string; color: string }) => {
   const cursorRef = useRef<HTMLDivElement>(null);
+  const [msg, setMsg] = useState("");
   
+  useEffect(() => {
+    const cycleMessage = () => {
+      if (Math.random() < 0.4) {
+        setMsg("...");
+        setTimeout(() => {
+          setMsg(MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
+          setTimeout(() => {
+            setMsg("");
+          }, 3000 + Math.random() * 2000);
+        }, 1000 + Math.random() * 1000);
+      }
+    };
+    
+    // Check frequently if we should type something new (if currently empty)
+    const interval = setInterval(() => {
+      setMsg(prev => {
+        if (!prev) cycleMessage();
+        return prev;
+      });
+    }, 5000 + Math.random() * 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const getBounds = () => {
     if (typeof document !== 'undefined') {
       return {
@@ -501,12 +538,14 @@ const AgentCursor = ({ name, color }: { name: string; color: string }) => {
           strokeLinejoin="round"
         />
       </svg>
-      <div
-        className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold whitespace-nowrap shadow-md mt-3 backdrop-blur-md"
-        style={{ backgroundColor: color + '4d' }}
-      >
-        {name} working...
-      </div>
+      {msg && (
+        <div
+          className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold whitespace-nowrap shadow-md mt-3 backdrop-blur-md transition-opacity duration-300"
+          style={{ backgroundColor: color + '4d' }}
+        >
+          {msg}
+        </div>
+      )}
     </div>
   );
 };
