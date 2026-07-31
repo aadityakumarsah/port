@@ -386,7 +386,6 @@ const ContribBadge = ({ logo, href, label, yc, idx }: { logo: string; href: stri
 };
 
 const AGENTS = [
-  { name: "Devin", color: "#ef4444" },
   { name: "Claude", color: "#f97316" },
   { name: "Codex", color: "#3b82f6" },
   { name: "Pi", color: "#10b981" },
