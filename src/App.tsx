@@ -367,6 +367,125 @@ const ContribBadge = ({ logo, href, label, yc, idx }: { logo: string; href: stri
   );
 };
 
+const AGENTS = [
+  { name: "Devin", color: "#ef4444" },
+  { name: "Claude", color: "#f97316" },
+  { name: "Codex", color: "#3b82f6" },
+  { name: "Pi", color: "#10b981" },
+];
+
+const AgentCursor = ({ name, color }: { name: string; color: string }) => {
+  const cursorRef = useRef<HTMLDivElement>(null);
+  
+  const getBounds = () => {
+    if (typeof document !== 'undefined') {
+      return {
+        w: document.documentElement.scrollWidth,
+        h: document.documentElement.scrollHeight
+      };
+    }
+    return { w: typeof window !== 'undefined' ? window.innerWidth : 1000, h: typeof window !== 'undefined' ? window.innerHeight : 1000 };
+  };
+
+  const initialBounds = getBounds();
+
+  const posRef = useRef({ x: Math.random() * initialBounds.w, y: Math.random() * initialBounds.h });
+  const targetRef = useRef({ x: Math.random() * initialBounds.w, y: Math.random() * initialBounds.h });
+  const velRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const tick = () => {
+      if (!cursorRef.current) return;
+
+      const bounds = getBounds();
+
+      // Check if their current target is outside the user's view
+      const targetIsOutOfView = targetRef.current.y < window.scrollY || targetRef.current.y > window.scrollY + window.innerHeight;
+
+      // Update target IMMEDIATELY if you scrolled away, otherwise update very rarely (smooth ambient movement)
+      if (targetIsOutOfView || Math.random() < 0.005) {
+        targetRef.current = {
+          x: Math.random() * (bounds.w - 100),
+          y: window.scrollY + Math.random() * (window.innerHeight - 100),
+        };
+      }
+
+      const dx = targetRef.current.x - posRef.current.x;
+      const dy = targetRef.current.y - posRef.current.y;
+      
+      // Gentle pull
+      const k = 0.001; 
+      let ax = dx * k;
+      let ay = dy * k;
+
+      // High friction for smooth, gliding movement
+      const damping = 0.94; 
+      velRef.current.x = (velRef.current.x + ax) * damping;
+      velRef.current.y = (velRef.current.y + ay) * damping;
+
+      // Almost unnoticeable random drift
+      velRef.current.x += (Math.random() - 0.5) * 0.02;
+      velRef.current.y += (Math.random() - 0.5) * 0.02;
+
+      // Fast max velocity so they don't lag behind when scrolling fast, but rarely hit this speed ambiently
+      const maxVel = 12.0;
+      velRef.current.x = Math.max(-maxVel, Math.min(maxVel, velRef.current.x));
+      velRef.current.y = Math.max(-maxVel, Math.min(maxVel, velRef.current.y));
+
+      posRef.current.x += velRef.current.x;
+      posRef.current.y += velRef.current.y;
+
+      const maxX = bounds.w - 20;
+      const maxY = bounds.h - 20;
+      
+      if (posRef.current.x < 0) { posRef.current.x = 0; velRef.current.x *= -1; }
+      if (posRef.current.x > maxX) { posRef.current.x = maxX; velRef.current.x *= -1; }
+      if (posRef.current.y < 0) { posRef.current.y = 0; velRef.current.y *= -1; }
+      if (posRef.current.y > maxY) { posRef.current.y = maxY; velRef.current.y *= -1; }
+
+      cursorRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px)`;
+
+      animationFrameId = requestAnimationFrame(tick);
+    };
+
+    animationFrameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
+  return (
+    <div
+      ref={cursorRef}
+      className="absolute top-0 left-0 z-[100] pointer-events-none flex items-start gap-1.5 drop-shadow-lg"
+      style={{ willChange: 'transform' }}
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        style={{ transform: 'rotate(-15deg)', color }}
+      >
+        <path
+          d="M7 2L20.8906 13.6265C21.849 14.4286 21.2828 15.986 20.0381 16.037L14.7731 16.2555L11.7588 21.4646C11.1396 22.5348 9.53986 22.3995 9.15579 21.2464L7 2Z"
+          fill="currentColor"
+          stroke="white"
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <div 
+        className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold whitespace-nowrap shadow-md mt-3"
+        style={{ backgroundColor: color }}
+      >
+        {name} working...
+      </div>
+    </div>
+  );
+};
+
 export function App() {
   const [leaves, setLeaves] = useState<LeafParticle[]>([]);
   const [bgLeaves, setBgLeaves] = useState<LeafParticle[]>([]);
@@ -540,6 +659,11 @@ export function App() {
       )}
       <div className={loading ? "hidden" : ""}>
       <div className="relative min-h-screen overflow-x-hidden bg-black text-zinc-300 font-sans selection:bg-indigo-500/30 selection:text-indigo-200">
+      
+      {/* Agent Cursors */}
+      {!loading && AGENTS.map((agent, i) => (
+        <AgentCursor key={i} name={agent.name} color={agent.color} />
+      ))}
       
       {/* Background Floating Logos */}
       {bgLeaves.map(leaf => (
