@@ -64,6 +64,8 @@ import vllmLogo from "./public/language/vLLM.png";
 import kubernetesLogo from "./public/language/kubernetes.png";
 import javaLogo from "./public/language/java.png";
 import reactLogo from "./public/language/react.png";
+import redisLogo from "./public/language/redis.png";
+import dockerLogo from "./public/language/docker.png";
 
 import "./index.css";
 
@@ -109,6 +111,8 @@ const leafLogos = [
   kubernetesLogo,
   javaLogo,
   reactLogo,
+  redisLogo,
+  dockerLogo,
   clickImage,
 ];
 
@@ -618,7 +622,7 @@ export function App() {
             {/* Tech Stack Section */}
             <section id="tech-stack" className="scroll-mt-16 md:scroll-mt-24">
               <div className="mb-6">
-                <h2 className="text-xl font-bold uppercase tracking-widest text-white">Tech Stack (17)</h2>
+                <h2 className="text-xl font-bold uppercase tracking-widest text-white">Tech Stack (19)</h2>
               </div>
               <div className="flex flex-wrap gap-2.5 ml-3">
                 {[
@@ -638,6 +642,8 @@ export function App() {
                   { name: "Kubernetes", logo: kubernetesLogo },
                   { name: "Java", logo: javaLogo },
                   { name: "React", logo: reactLogo },
+                  { name: "Redis", logo: redisLogo },
+                  { name: "Docker", logo: dockerLogo },
                   { name: "System Design", icon: Server },
                 ].map((tech, idx) => (
                   <TechBadge key={idx} tech={tech} idx={idx} />
@@ -662,9 +668,15 @@ export function App() {
                   <div className="z-10 sm:col-span-6">
                     <h3 className="font-medium leading-snug text-zinc-200">
                       <div>
-                        <a className="inline-flex items-baseline font-medium leading-tight text-zinc-200 hover:text-indigo-300 focus-visible:text-indigo-300 group/link text-base" href="#" target="_blank" rel="noreferrer">
+                        <a 
+                          className="inline-flex items-center gap-1.5 text-base font-medium text-zinc-200 hover:text-indigo-300 transition-colors group/link cursor-pointer" 
+                          href="https://shipd.ai/" 
+                          target="_blank" 
+                          rel="noreferrer"
+                        >
                           <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block"></span>
-                          <span className="inline-flex items-center gap-1.5">Software Engineer · <img src={shipdLogo} alt="Shipd" className="h-4 w-4 rounded-sm" /> <span className="inline-flex items-center gap-1">Shipd (<span className="inline-flex items-center gap-1 font-bold text-[#FF6600]"><img src={ycLogo} alt="YC" className="h-4 w-4" />W24</span>)</span></span>
+                          <span>Software Engineer · <img src={shipdLogo} alt="Shipd" className="h-4 w-4 rounded-sm inline" /> <span className="inline-flex items-center gap-1 text-base font-medium">Shipd (<span className="inline-flex items-center gap-1 font-bold text-[#FF6600]"><img src={ycLogo} alt="YC" className="h-4 w-4" />W24</span>)</span></span>
+                          <ExternalLink className="ml-1 inline-block h-3.5 w-3.5 shrink-0 translate-y-0.5 transition-transform group-hover/link:-translate-y-1 group-hover/link:translate-x-1" />
                         </a>
                       </div>
                     </h3>
@@ -684,9 +696,15 @@ export function App() {
                   <div className="z-10 sm:col-span-6">
                     <h3 className="font-medium leading-snug text-zinc-200">
                       <div>
-                        <a className="inline-flex items-baseline font-medium leading-tight text-zinc-200 hover:text-indigo-300 focus-visible:text-indigo-300 group/link text-base" href="#" target="_blank" rel="noreferrer">
+                        <a 
+                          className="inline-flex items-center gap-1.5 text-base font-medium text-zinc-200 hover:text-indigo-300 transition-colors group/link cursor-pointer" 
+                          href="https://www.aiecho.live/" 
+                          target="_blank" 
+                          rel="noreferrer"
+                        >
                           <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block"></span>
-                          <span className="inline-flex items-center gap-1.5">Full-Stack Developer · <img src={echoLogo} alt="Echo" className="h-4 w-4 rounded-sm" /> <span>Echo</span></span>
+                          <span>Full-Stack Developer · <img src={echoLogo} alt="Echo" className="h-4 w-4 rounded-sm inline" /> <span>Echo</span></span>
+                          <ExternalLink className="ml-1 inline-block h-3.5 w-3.5 shrink-0 translate-y-0.5 transition-transform group-hover/link:-translate-y-1 group-hover/link:translate-x-1" />
                         </a>
                       </div>
                       <div className="text-zinc-500 text-sm mt-1">No-Contact Breakup Wellness Startup</div>
@@ -707,7 +725,16 @@ export function App() {
                   <div className="z-10 sm:col-span-6">
                     <h3 className="font-medium leading-snug text-zinc-200">
                       <div>
-                        <span className="inline-flex items-center gap-1.5 text-base font-medium group-hover:text-indigo-300 transition-colors">Backend Developer · <img src={deltaLogo} alt="Delta Electronics" className="h-4 w-4 rounded-sm" /> Delta Electronics</span>
+                        <a 
+                          className="inline-flex items-center gap-1.5 text-base font-medium text-zinc-200 hover:text-indigo-300 transition-colors group/link cursor-pointer" 
+                          href="https://www.deltaww.com/en-US/index" 
+                          target="_blank" 
+                          rel="noreferrer"
+                        >
+                          <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block"></span>
+                          <span>Backend Developer · <img src={deltaLogo} alt="Delta Electronics" className="h-4 w-4 rounded-sm inline" /> <span>Delta Electronics</span></span>
+                          <ExternalLink className="ml-1 inline-block h-3.5 w-3.5 shrink-0 translate-y-0.5 transition-transform group-hover/link:-translate-y-1 group-hover/link:translate-x-1" />
+                        </a>
                       </div>
                     </h3>
                     <p className="mt-2 text-sm leading-normal text-zinc-400">
@@ -726,7 +753,16 @@ export function App() {
                   <div className="z-10 sm:col-span-6">
                     <h3 className="font-medium leading-snug text-zinc-200">
                       <div>
-                        <span className="inline-flex items-center gap-1.5 text-base font-medium group-hover:text-indigo-300 transition-colors">SDE I - Backend · <img src={digitalNirmanLogo} alt="Digital Nirman" className="h-4 w-4 rounded-sm" /> Digital Nirman</span>
+                        <a 
+                          className="inline-flex items-center gap-1.5 text-base font-medium text-zinc-200 hover:text-indigo-300 transition-colors group/link cursor-pointer" 
+                          href="https://digitalnirman.vercel.app/" 
+                          target="_blank" 
+                          rel="noreferrer"
+                        >
+                          <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block"></span>
+                          <span>SDE I - Backend · <img src={digitalNirmanLogo} alt="Digital Nirman" className="h-4 w-4 rounded-sm inline" /> <span>Digital Nirman</span></span>
+                          <ExternalLink className="ml-1 inline-block h-3.5 w-3.5 shrink-0 translate-y-0.5 transition-transform group-hover/link:-translate-y-1 group-hover/link:translate-x-1" />
+                        </a>
                       </div>
                       <div className="text-zinc-500 text-sm mt-1">School Management SaaS</div>
                     </h3>
@@ -751,7 +787,7 @@ export function App() {
                   {
                     name: "Lemda - Terminal Agent",
                     desc: "Reached the top of a Terminal-Bench leaderboard through autonomous terminal execution and end-to-end task completion.",
-                    link: "https://github.com/aadityakumarsah/lemda",
+                    link: "https://lemda.pages.dev",
                     logo: lamdaLogo
                   },
                   {
@@ -767,10 +803,10 @@ export function App() {
                     logo: modelRouterLogo
                   },
                   {
-                    name: "NagarikAI",
-                    desc: "Built Anchor/Rust smart contracts and FastAPI AI agents for automated verification using ZK identity, prediction markets, and distributed data services.",
-                    link: "https://github.com/aadityakumarsah/Dhukuti-Protocol",
-                    logo: nagrikLogo
+                   name: "Dhukuti Protocol",
+                   desc: "A trustless rotating savings system (ROSCA) built on the Solana blockchain. Click to view the full protocol documentation & reference guide.",
+                   link: "https://docs-dhukuti-protocol.vercel.app/",
+                   logo: nagrikLogo
                   }
                 ].map((project, i) => (
                   <div key={i} className="group relative grid gap-4 pb-1 transition-all sm:grid-cols-8 sm:gap-8 md:gap-4">
@@ -863,11 +899,22 @@ export function App() {
                 </div>
                 
                 <div className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 -mx-4 rounded-xl transition-all hover:bg-zinc-800/50">
-                  <div>
-                    <h3 className="font-semibold text-zinc-200">High School (+2), Science Stream</h3>
+                  <div className="z-10">
+                    <h3 className="font-semibold text-zinc-200">
+                      <a 
+                        className="inline-flex items-center gap-1 font-semibold text-zinc-200 hover:text-indigo-300 transition-colors group/link cursor-pointer text-base" 
+                        href="https://www.facebook.com/photo?fbid=1410878644400236&set=a.550394217115354" 
+                        target="_blank" 
+                        rel="noreferrer"
+                      >
+                        <span className="absolute -inset-x-4 -inset-y-2.5 hidden rounded md:-inset-x-6 md:-inset-y-4 lg:block"></span>
+                        <span>High School (+2), Science Stream</span>
+                        <ExternalLink className="ml-1 inline-block h-3.5 w-3.5 shrink-0 translate-y-0.5 transition-transform group-hover/link:-translate-y-1 group-hover/link:translate-x-1" />
+                      </a>
+                    </h3>
                     <p className="text-zinc-500 inline-flex items-center gap-1.5"><img src={arnikoLogo} alt="Arniko College" className="h-4 w-4 rounded-sm" /> Arniko College, Biratnagar, Nepal</p>
                   </div>
-                  <span className="text-zinc-500 font-medium bg-zinc-900/80 px-3 py-1 rounded-full text-xs border border-zinc-800">Graduated 2026</span>
+                  <span className="text-zinc-500 font-medium bg-zinc-900/80 px-3 py-1 rounded-full text-xs border border-zinc-800 z-10">Graduated 2026</span>
                 </div>
               </div>
 
@@ -958,6 +1005,8 @@ export function App() {
         </div>
       </div>
     </div>
+
+
     </>
   );
 }
