@@ -498,7 +498,7 @@ const AgentCursor = ({ name, color }: { name: string; color: string }) => {
       </svg>
       <div
         className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold whitespace-nowrap shadow-md mt-3 backdrop-blur-md"
-        style={{ backgroundColor: color + 'b3' }}
+        style={{ backgroundColor: color + '4d' }}
       >
         {name} working...
       </div>
