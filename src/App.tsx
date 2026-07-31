@@ -141,6 +141,8 @@ interface PhysicsParticle {
   isBg: boolean;
 }
 
+export const globalAgentPositions: Record<string, { x: number, y: number }> = {};
+
 const TechBadge = ({ tech, idx }: { tech: any; idx: number }) => {
   const elementRef = useRef<HTMLDivElement>(null);
   
@@ -176,26 +178,35 @@ const TechBadge = ({ tech, idx }: { tech: any; idx: number }) => {
       }
 
       const rect = elementRef.current.getBoundingClientRect();
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
 
       let ax = 0;
       let ay = 0;
       let arot = 0;
 
-      const dx = (rect.left + rect.width / 2) - mx;
-      const dy = (rect.top + rect.height / 2) - my;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const badgeX = rect.left + rect.width / 2;
+      const badgeY = rect.top + rect.height / 2;
       const repulsionRadius = 100; // soft and gentle radius
 
-      if (dist < repulsionRadius && dist > 0) {
-        // Subtle quadratic push
-        const normalizedDist = dist / repulsionRadius;
-        const force = Math.pow(1.0 - normalizedDist, 2.0) * 1.8; 
-        ax = (dx / dist) * force;
-        ay = (dy / dist) * force;
-        arot = (dx > 0 ? 1 : -1) * force * 1.0;
-      }
+      const applyRepulsion = (cx: number, cy: number) => {
+        const dx = badgeX - cx;
+        const dy = badgeY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < repulsionRadius && dist > 0) {
+          const normalizedDist = dist / repulsionRadius;
+          const force = Math.pow(1.0 - normalizedDist, 2.0) * 1.8; 
+          ax += (dx / dist) * force;
+          ay += (dy / dist) * force;
+          arot += (dx > 0 ? 1 : -1) * force * 1.0;
+        }
+      };
+
+      // Real mouse repulsion
+      applyRepulsion(mouseRef.current.x, mouseRef.current.y);
+
+      // Agent cursors repulsion (convert absolute document coords to viewport coords)
+      Object.values(globalAgentPositions).forEach(pos => {
+        applyRepulsion(pos.x - window.scrollX, pos.y - window.scrollY);
+      });
 
       // Spring pulling back to Home drifting orbit
       const k = 0.05; // elastic spring constant
@@ -293,25 +304,32 @@ const ContribBadge = ({ logo, href, label, yc, idx }: { logo: string; href: stri
       }
 
       const rect = elementRef.current.getBoundingClientRect();
-      const mx = mouseRef.current.x;
-      const my = mouseRef.current.y;
 
       let ax = 0;
       let ay = 0;
       let arot = 0;
 
-      const dx = (rect.left + rect.width / 2) - mx;
-      const dy = (rect.top + rect.height / 2) - my;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+      const badgeX = rect.left + rect.width / 2;
+      const badgeY = rect.top + rect.height / 2;
       const repulsionRadius = 100;
 
-      if (dist < repulsionRadius && dist > 0) {
-        const normalizedDist = dist / repulsionRadius;
-        const force = Math.pow(1.0 - normalizedDist, 2.0) * 1.8; 
-        ax = (dx / dist) * force;
-        ay = (dy / dist) * force;
-        arot = (dx > 0 ? 1 : -1) * force * 1.0;
-      }
+      const applyRepulsion = (cx: number, cy: number) => {
+        const dx = badgeX - cx;
+        const dy = badgeY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < repulsionRadius && dist > 0) {
+          const normalizedDist = dist / repulsionRadius;
+          const force = Math.pow(1.0 - normalizedDist, 2.0) * 1.8; 
+          ax += (dx / dist) * force;
+          ay += (dy / dist) * force;
+          arot += (dx > 0 ? 1 : -1) * force * 1.0;
+        }
+      };
+
+      applyRepulsion(mouseRef.current.x, mouseRef.current.y);
+      Object.values(globalAgentPositions).forEach(pos => {
+        applyRepulsion(pos.x - window.scrollX, pos.y - window.scrollY);
+      });
 
       const k = 0.05;
       const targetX = Math.sin(time * floatSpeedX) * floatAmpX;
@@ -445,6 +463,8 @@ const AgentCursor = ({ name, color }: { name: string; color: string }) => {
       if (posRef.current.y < 0) { posRef.current.y = 0; velRef.current.y *= -1; }
       if (posRef.current.y > maxY) { posRef.current.y = maxY; velRef.current.y *= -1; }
 
+      globalAgentPositions[name] = { x: posRef.current.x, y: posRef.current.y };
+
       cursorRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px)`;
 
       animationFrameId = requestAnimationFrame(tick);
@@ -476,9 +496,9 @@ const AgentCursor = ({ name, color }: { name: string; color: string }) => {
           strokeLinejoin="round"
         />
       </svg>
-      <div 
-        className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold whitespace-nowrap shadow-md mt-3"
-        style={{ backgroundColor: color }}
+      <div
+        className="px-2 py-0.5 rounded-full text-white text-[10px] font-bold whitespace-nowrap shadow-md mt-3 backdrop-blur-md"
+        style={{ backgroundColor: color + 'b3' }}
       >
         {name} working...
       </div>
