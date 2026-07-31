@@ -5,6 +5,11 @@
     @apply font-sans;
   }
 
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   body {
     @apply min-h-screen relative m-0 bg-black text-zinc-300;
   }

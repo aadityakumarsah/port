@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Mail,
   Phone,
@@ -17,6 +17,7 @@ import {
   Zap,
   Activity,
   ChevronRight,
+  Server,
 } from "lucide-react";
 import ycLogo from "./public/yc.png";
 import shipdLogo from "./public/shipd.png";
@@ -46,6 +47,24 @@ import hackClubLogo from "./public/hack-club.png";
 import insforgeLogo from "./public/insforge.png";
 import fossasiaLogo from "./public/fossasia.png";
 
+// Language & Tech Stack Imports
+import anchorLogo from "./public/language/anchor.png";
+import crewaiLogo from "./public/language/CrewAI.png";
+import dspyLogo from "./public/language/DSPy.png";
+import fastapiLogo from "./public/language/fastapi.png";
+import grpcLogo from "./public/language/grpc.png";
+import huggingfaceLogo from "./public/language/HuggingFaceSuite.png";
+import langchainLogo from "./public/language/langchain.png";
+import llamaindexLogo from "./public/language/LlamaIndex.png";
+import pgvectorLogo from "./public/language/pgvector.png";
+import pytorchLogo from "./public/language/pytorch.png";
+import rustLogo from "./public/language/rust.png";
+import typescriptLogo from "./public/language/typescript.png";
+import vllmLogo from "./public/language/vLLM.png";
+import kubernetesLogo from "./public/language/kubernetes.png";
+import javaLogo from "./public/language/java.png";
+import reactLogo from "./public/language/react.png";
+
 import "./index.css";
 
 const leafLogos = [
@@ -74,10 +93,24 @@ const leafLogos = [
   hackClubLogo,
   insforgeLogo,
   fossasiaLogo,
+  anchorLogo,
+  crewaiLogo,
+  dspyLogo,
+  fastapiLogo,
+  grpcLogo,
+  huggingfaceLogo,
+  langchainLogo,
+  llamaindexLogo,
+  pgvectorLogo,
+  pytorchLogo,
+  rustLogo,
+  typescriptLogo,
+  vllmLogo,
+  kubernetesLogo,
+  javaLogo,
+  reactLogo,
   clickImage,
 ];
-
-import "./index.css";
 
 interface LeafParticle {
   id: number;
@@ -88,6 +121,247 @@ interface LeafParticle {
   rot: string;
   src: string;
 }
+
+interface PhysicsParticle {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  rot: number;
+  vrot: number;
+  scale: number;
+  opacity: number;
+  decay: number;
+  src: string;
+  isBg: boolean;
+}
+
+const TechBadge = ({ tech, idx }: { tech: any; idx: number }) => {
+  const elementRef = useRef<HTMLDivElement>(null);
+  
+  // High-performance direct-DOM physics states
+  const posRef = useRef({ x: 0, y: 0 });
+  const velRef = useRef({ x: 0, y: 0 });
+  const rotRef = useRef(0);
+  const rotVelRef = useRef(0);
+  
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    window.addEventListener("mousemove", handleGlobalMouseMove);
+    return () => window.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, []);
+
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const floatSpeedX = 0.0006 + (idx % 3) * 0.0003;
+    const floatSpeedY = 0.0005 + (idx % 2) * 0.0002;
+    const floatAmpX = 2.5 + (idx % 2) * 1.0;
+    const floatAmpY = 1.5 + (idx % 3) * 1.0;
+
+    const tick = (time: number) => {
+      if (!elementRef.current) {
+        animationFrameId = requestAnimationFrame(tick);
+        return;
+      }
+
+      const rect = elementRef.current.getBoundingClientRect();
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+
+      let ax = 0;
+      let ay = 0;
+      let arot = 0;
+
+      const dx = (rect.left + rect.width / 2) - mx;
+      const dy = (rect.top + rect.height / 2) - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const repulsionRadius = 100; // soft and gentle radius
+
+      if (dist < repulsionRadius && dist > 0) {
+        // Subtle quadratic push
+        const normalizedDist = dist / repulsionRadius;
+        const force = Math.pow(1.0 - normalizedDist, 2.0) * 1.8; 
+        ax = (dx / dist) * force;
+        ay = (dy / dist) * force;
+        arot = (dx > 0 ? 1 : -1) * force * 1.0;
+      }
+
+      // Spring pulling back to Home drifting orbit
+      const k = 0.05; // elastic spring constant
+      const targetX = Math.sin(time * floatSpeedX) * floatAmpX;
+      const targetY = Math.cos(time * floatSpeedY) * floatAmpY;
+
+      const springX = (targetX - posRef.current.x) * k;
+      const springY = (targetY - posRef.current.y) * k;
+      const springRot = -rotRef.current * k;
+
+      ax += springX;
+      ay += springY;
+      arot += springRot;
+
+      // Damping / Friction
+      const damping = 0.88; 
+      velRef.current.x = (velRef.current.x + ax) * damping;
+      velRef.current.y = (velRef.current.y + ay) * damping;
+      rotVelRef.current = (rotVelRef.current + arot) * 0.82;
+
+      posRef.current.x += velRef.current.x;
+      posRef.current.y += velRef.current.y;
+      rotRef.current += rotVelRef.current;
+
+      // Safe, tight visual limits to prevent adjacent card overlapping
+      const maxLimitX = 12;
+      const maxLimitY = 10;
+      posRef.current.x = Math.max(-maxLimitX, Math.min(maxLimitX, posRef.current.x));
+      posRef.current.y = Math.max(-maxLimitY, Math.min(maxLimitY, posRef.current.y));
+
+      // Direct DOM update
+      elementRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px) rotate(${rotRef.current}deg)`;
+
+      animationFrameId = requestAnimationFrame(tick);
+    };
+
+    animationFrameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [idx]);
+
+  return (
+    <div
+      ref={elementRef}
+      className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-zinc-800/80 bg-zinc-900/20 hover:border-indigo-500/50 hover:bg-zinc-900/40 cursor-pointer transition-colors duration-300 group select-none"
+    >
+      {tech.icon ? (
+        <tech.icon className="h-5 w-5 text-indigo-400 group-hover:text-indigo-300 transition-colors" />
+      ) : (
+        <img 
+          src={tech.logo} 
+          alt={tech.name} 
+          className={`h-5 w-5 object-contain filter group-hover:brightness-110 transition-transform duration-300 ${
+            tech.name === "DSPy" || tech.name === "vLLM" ? "scale-[1.45]" : ""
+          }`} 
+        />
+      )}
+      <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">{tech.name}</span>
+    </div>
+  );
+};
+
+const ContribBadge = ({ logo, href, label, yc, idx }: { logo: string; href: string; label: string; yc?: string; idx: number }) => {
+  const elementRef = useRef<HTMLDivElement>(null);
+  
+  const posRef = useRef({ x: 0, y: 0 });
+  const velRef = useRef({ x: 0, y: 0 });
+  const rotRef = useRef(0);
+  const rotVelRef = useRef(0);
+  
+  const mouseRef = useRef({ x: -1000, y: -1000 });
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+
+    window.addEventListener("mousemove", handleGlobalMouseMove);
+    return () => window.removeEventListener("mousemove", handleGlobalMouseMove);
+  }, []);
+
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const floatSpeedX = 0.0006 + (idx % 3) * 0.0003;
+    const floatSpeedY = 0.0005 + (idx % 2) * 0.0002;
+    const floatAmpX = 2.0 + (idx % 2) * 1.0;
+    const floatAmpY = 1.0 + (idx % 3) * 1.0;
+    const rotSpeed = 0.0003 + (idx % 2) * 0.0002;
+    const rotAmp = 1.0 + (idx % 3) * 0.8;
+
+    const tick = (time: number) => {
+      if (!elementRef.current) {
+        animationFrameId = requestAnimationFrame(tick);
+        return;
+      }
+
+      const rect = elementRef.current.getBoundingClientRect();
+      const mx = mouseRef.current.x;
+      const my = mouseRef.current.y;
+
+      let ax = 0;
+      let ay = 0;
+      let arot = 0;
+
+      const dx = (rect.left + rect.width / 2) - mx;
+      const dy = (rect.top + rect.height / 2) - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const repulsionRadius = 100;
+
+      if (dist < repulsionRadius && dist > 0) {
+        const normalizedDist = dist / repulsionRadius;
+        const force = Math.pow(1.0 - normalizedDist, 2.0) * 1.8; 
+        ax = (dx / dist) * force;
+        ay = (dy / dist) * force;
+        arot = (dx > 0 ? 1 : -1) * force * 1.0;
+      }
+
+      const k = 0.05;
+      const targetX = Math.sin(time * floatSpeedX) * floatAmpX;
+      const targetY = Math.cos(time * floatSpeedY) * floatAmpY;
+
+      const springX = (targetX - posRef.current.x) * k;
+      const springY = (targetY - posRef.current.y) * k;
+      const springRot = -rotRef.current * k;
+
+      ax += springX;
+      ay += springY;
+      arot += springRot;
+
+      const damping = 0.88; 
+      velRef.current.x = (velRef.current.x + ax) * damping;
+      velRef.current.y = (velRef.current.y + ay) * damping;
+      rotVelRef.current = (rotVelRef.current + arot) * 0.82;
+
+      posRef.current.x += velRef.current.x;
+      posRef.current.y += velRef.current.y;
+      rotRef.current += rotVelRef.current;
+
+      const maxLimitX = 8;
+      const maxLimitY = 6;
+      posRef.current.x = Math.max(-maxLimitX, Math.min(maxLimitX, posRef.current.x));
+      posRef.current.y = Math.max(-maxLimitY, Math.min(maxLimitY, posRef.current.y));
+
+      elementRef.current.style.transform = `translate(${posRef.current.x}px, ${posRef.current.y}px) rotate(${rotRef.current}deg)`;
+
+      animationFrameId = requestAnimationFrame(tick);
+    };
+
+    animationFrameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [idx]);
+
+  return (
+    <div
+      ref={elementRef}
+      className="inline-flex items-center gap-1.5 text-sm border border-zinc-700/50 rounded-md px-2 py-1 bg-zinc-900/10 hover:border-indigo-500/50 hover:bg-zinc-900/40 cursor-pointer transition-colors duration-300 select-none group/contrib"
+    >
+      <img src={logo} alt={label} className="h-4 w-4 rounded-sm" />
+      <a href={href} target="_blank" rel="noreferrer" className="font-medium text-zinc-200 group-hover/contrib:text-indigo-300 transition-colors">
+        {label}
+      </a>
+      {yc && (
+        <span className="inline-flex items-center gap-0.5 font-bold text-[#FF6600] text-xs">
+          <img src={ycLogo} alt="YC" className="h-3 w-3" />
+          {yc}
+        </span>
+      )}
+    </div>
+  );
+};
 
 export function App() {
   const [leaves, setLeaves] = useState<LeafParticle[]>([]);
@@ -107,6 +381,7 @@ export function App() {
     }
   }, [fading]);
 
+  // Event listeners for Click and MouseMove
   useEffect(() => {
     const playClickSound = () => {
       try {
@@ -130,14 +405,14 @@ export function App() {
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.1);
       } catch (err) {
-        // Ignore audio errors (e.g. if autoplay policy blocks it)
+        // Ignore audio errors
       }
     };
 
     const handleClick = (e: MouseEvent) => {
       playClickSound();
       
-      const numLeaves = Math.floor(Math.random() * 3) + 4;
+      const numLeaves = Math.floor(Math.random() * 3) + 4; // original 4-6 leaves
       const newLeaves: LeafParticle[] = [];
       const idPrefix = Date.now();
       
@@ -170,10 +445,10 @@ export function App() {
 
     const handleMouseMove = (e: MouseEvent) => {
       const now = Date.now();
-      if (now - lastMove < 50) return;
+      if (now - lastMove < 50) return; // original 50ms throttle
       lastMove = now;
 
-      const count = Math.floor(Math.random() * 2) + 1;
+      const count = Math.floor(Math.random() * 2) + 1; // original 1-2 trailing leaves
       const newLeaves: LeafParticle[] = [];
       const idPrefix = now;
       
@@ -211,6 +486,7 @@ export function App() {
     };
   }, []);
 
+  // Background slow CSS drift leaves
   useEffect(() => {
     const spawnBgLeaf = () => {
       const angle = Math.random() * Math.PI * 2;
@@ -316,7 +592,7 @@ export function App() {
                 Backend & Applied AI Engineer
               </h2>
               <p className="mt-4 max-w-2xl leading-relaxed text-zinc-400">
-                Building production <span className="text-zinc-300 font-medium">FastAPI/PostgreSQL</span> services, full-stack products, and agent systems.
+                Ai applied engineer, core system engineer(Rust) & distributed systems
               </p>
             </div>
             </header>
@@ -331,11 +607,41 @@ export function App() {
               </div>
               <div className="space-y-4 text-zinc-400 leading-relaxed">
                 <p>
-                  Currently contributing to production engineering at <span className="inline-flex items-center gap-1 font-medium text-zinc-200">Shipd (<span className="inline-flex items-center gap-1 font-bold text-[#FF6600]"><img src={ycLogo} alt="YC" className="h-4 w-4" />W24</span>)</span>, with hands-on experience in API design, real-time LLM features, data modelling, Docker, CI/CD, model routing, context management, and agent evaluation.
+                  Currently contributing to production engineering at <span className="inline-flex items-center gap-1 font-medium text-zinc-200">Shipd (<span className="inline-flex items-center gap-1 font-bold text-[#FF6600]"><img src={ycLogo} alt="YC" className="h-4 w-4" />W24</span>)</span>, with hands-on experience in API design, <span className="font-medium text-zinc-200">System design</span>, real-time LLM features, data modelling, Docker, CI/CD, model routing, context management, and <span className="font-medium text-zinc-200">agent evaluation</span>.
                 </p>
                 <p>
                   I've built and maintained <a href="https://clario-well.pages.dev/" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-all duration-200 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]"><img src={clarioLogo} alt="Clario" className="h-5 w-5 inline align-middle rounded-sm" /><span className="ml-1">Clario</span></a>, serving <span className="font-medium text-zinc-200">5,000+ active users</span>. My expertise lies at the intersection of robust backend infrastructure and applied artificial intelligence, crafting reliable agent systems and APIs.
                 </p>
+              </div>
+            </section>
+
+            {/* Tech Stack Section */}
+            <section id="tech-stack" className="scroll-mt-16 md:scroll-mt-24">
+              <div className="mb-6">
+                <h2 className="text-xl font-bold uppercase tracking-widest text-white">Tech Stack (17)</h2>
+              </div>
+              <div className="flex flex-wrap gap-2.5 ml-3">
+                {[
+                  { name: "Rust", logo: rustLogo },
+                  { name: "TypeScript", logo: typescriptLogo },
+                  { name: "FastAPI", logo: fastapiLogo },
+                  { name: "gRPC", logo: grpcLogo },
+                  { name: "pgvector", logo: pgvectorLogo },
+                  { name: "LlamaIndex", logo: llamaindexLogo },
+                  { name: "LangChain", logo: langchainLogo },
+                  { name: "CrewAI", logo: crewaiLogo },
+                  { name: "DSPy", logo: dspyLogo },
+                  { name: "vLLM", logo: vllmLogo },
+                  { name: "PyTorch", logo: pytorchLogo },
+                  { name: "Hugging Face", logo: huggingfaceLogo },
+                  { name: "Anchor", logo: anchorLogo },
+                  { name: "Kubernetes", logo: kubernetesLogo },
+                  { name: "Java", logo: javaLogo },
+                  { name: "React", logo: reactLogo },
+                  { name: "System Design", icon: Server },
+                ].map((tech, idx) => (
+                  <TechBadge key={idx} tech={tech} idx={idx} />
+                ))}
               </div>
             </section>
 
@@ -510,43 +816,27 @@ export function App() {
                 <li className="flex items-start gap-3">
                   <ChevronRight size={16} className="text-indigo-500 mt-1.5 shrink-0" />
                   <div>
-                    <span className="font-semibold text-zinc-200">Open-source contributor:</span>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 [&>*]:border [&>*]:border-zinc-700/50 [&>*]:rounded-md [&>*]:px-2 [&>*]:py-1">
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={cogneeLogo} alt="Cognee" className="h-4 w-4 rounded-sm" />
-                        <a href="https://cognee.ai" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">Cognee</a>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={mastraLogo} alt="Mastra" className="h-4 w-4 rounded-sm" />
-                        <a href="https://mastra.ai" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">Mastra</a>
-                        <span className="inline-flex items-center gap-0.5 font-bold text-[#FF6600] text-xs"><img src={ycLogo} alt="YC" className="h-3 w-3" />W25</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={modelenceLogo} alt="Modelence" className="h-4 w-4 rounded-sm" />
-                        <a href="https://modelence.com" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">Modelence</a>
-                        <span className="inline-flex items-center gap-0.5 font-bold text-[#FF6600] text-xs"><img src={ycLogo} alt="YC" className="h-3 w-3" />S25</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={metaLogo} alt="Meta" className="h-4 w-4 rounded-sm" />
-                        <a href="https://opensource.fb.com" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">Meta</a>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={openClawLogo} alt="OpenClaw" className="h-4 w-4 rounded-sm" />
-                        <a href="https://openclaw.ai" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">OpenClaw</a>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={insforgeLogo} alt="InsForge" className="h-4 w-4 rounded-sm" />
-                        <a href="https://insforge.dev" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">InsForge</a>
-                        <span className="inline-flex items-center gap-0.5 font-bold text-[#FF6600] text-xs"><img src={ycLogo} alt="YC" className="h-3 w-3" />P26</span>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={fossasiaLogo} alt="FOSS Asia" className="h-4 w-4 rounded-sm" />
-                        <a href="https://fossasia.org" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">FOSS Asia</a>
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 text-sm">
-                        <img src={kiloCodeLogo} alt="KiloCode" className="h-4 w-4 rounded-sm" />
-                        <a href="https://kilo.ai" target="_blank" rel="noreferrer" className="font-medium text-zinc-200 hover:text-indigo-300 transition-colors">KiloCode</a>
-                      </span>
+                    <span className="font-semibold text-zinc-200 block mb-2">Open-source contributor:</span>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                      {[
+                        { logo: cogneeLogo, href: "https://cognee.ai", label: "Cognee" },
+                        { logo: mastraLogo, href: "https://mastra.ai", label: "Mastra", yc: "W25" },
+                        { logo: modelenceLogo, href: "https://modelence.com", label: "Modelence", yc: "S25" },
+                        { logo: metaLogo, href: "https://opensource.fb.com", label: "Meta" },
+                        { logo: openClawLogo, href: "https://openclaw.ai", label: "OpenClaw" },
+                        { logo: insforgeLogo, href: "https://insforge.dev", label: "InsForge", yc: "P26" },
+                        { logo: fossasiaLogo, href: "https://fossasia.org", label: "FOSS Asia" },
+                        { logo: kiloCodeLogo, href: "https://kilo.ai", label: "KiloCode" },
+                      ].map((contrib, i) => (
+                        <ContribBadge
+                          key={i}
+                          idx={i}
+                          logo={contrib.logo}
+                          href={contrib.href}
+                          label={contrib.label}
+                          yc={contrib.yc}
+                        />
+                      ))}
                     </div>
                   </div>
                 </li>
@@ -601,35 +891,66 @@ export function App() {
 
           </main>
           
-          {/* Footer Contacts */}
-          <footer className="mt-12 pt-8 border-t border-zinc-800 flex flex-col items-center justify-center gap-6 pb-12">
-            <div className="flex flex-wrap justify-center gap-8 text-zinc-400 text-sm font-medium">
-              <a href="mailto:aadityakumarsah259@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Mail size={18} />
-                <span>aadityakumarsah259@gmail.com</span>
-              </a>
-              <a href="https://wa.me/9779827068776" className="flex items-center gap-2 hover:text-white transition-colors">
-                <Phone size={18} />
-                <span>+977 9827068776</span>
-              </a>
-              <div className="flex items-center gap-2">
-                <MapPin size={18} />
-                <span>Biratnagar, Nepal</span>
+          {/* Footer Questions & Contacts */}
+          <footer className="mt-16 pt-12 border-t border-zinc-800 flex flex-col gap-12 pb-16">
+            <div>
+              <h2 className="text-xl font-bold uppercase tracking-widest text-white mb-6">
+                What I ask myself while building
+              </h2>
+              <div className="space-y-4 ml-3">
+                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
+                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q1</span>
+                  <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">What all services do you need (fe/be etc)?</span>
+                </div>
+                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
+                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q2</span>
+                  <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">What happens if a server running your agent crashes?</span>
+                </div>
+                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
+                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q3</span>
+                  <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">How would you do context management?</span>
+                </div>
+                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
+                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q4</span>
+                  <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">How would you evaluate your agent?</span>
+                </div>
+                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
+                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q5</span>
+                  <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">What metrics do you observe as your app grows?</span>
+                </div>
               </div>
             </div>
-            <div className="flex flex-wrap justify-center gap-8 text-zinc-400 text-sm font-medium">
-              <a href="https://github.com/aadityakumarsah" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
-                <GitBranch size={18} />
-                <span>GitHub</span>
-              </a>
-              <a href="https://www.linkedin.com/in/aaditya-sah-516178308" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
-                <Globe size={18} />
-                <span>LinkedIn</span>
-              </a>
-              <a href="https://x.com/aadityakumarsa" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
-                <span>X</span>
-              </a>
+
+            {/* Contacts & Socials Divider */}
+            <div className="border-t border-zinc-800/80 pt-8 flex flex-col items-center gap-6">
+              <div className="flex flex-wrap justify-center gap-8 text-zinc-400 text-sm font-medium">
+                <a href="mailto:aadityakumarsah259@gmail.com" className="flex items-center gap-2 hover:text-white transition-colors">
+                  <Mail size={18} />
+                  <span>aadityakumarsah259@gmail.com</span>
+                </a>
+                <a href="https://wa.me/9779827068776" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
+                  <Phone size={18} />
+                  <span>+977 9827068776</span>
+                </a>
+                <div className="flex items-center gap-2 select-none">
+                  <MapPin size={18} />
+                  <span>Biratnagar, Nepal</span>
+                </div>
+              </div>
+              <div className="flex flex-wrap justify-center gap-8 text-zinc-400 text-sm font-medium">
+                <a href="https://github.com/aadityakumarsah" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
+                  <GitBranch size={18} />
+                  <span>GitHub</span>
+                </a>
+                <a href="https://www.linkedin.com/in/aaditya-sah-516178308" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
+                  <Globe size={18} />
+                  <span>LinkedIn</span>
+                </a>
+                <a href="https://x.com/aadityakumarsa" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
+                  <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
+                  <span>X</span>
+                </a>
+              </div>
             </div>
           </footer>
         </div>
