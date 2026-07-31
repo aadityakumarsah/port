@@ -424,8 +424,13 @@ const AgentCursor = ({ name, color }: { name: string; color: string }) => {
 
       // Update target IMMEDIATELY if you scrolled away, otherwise update very rarely (smooth ambient movement)
       if (targetIsOutOfView || Math.random() < 0.005) {
+        // Simple logic: pick either the left 15% or right 15% of the screen
+        const margin = bounds.w * 0.15;
+        const isLeft = Math.random() > 0.5;
+        const targetX = isLeft ? Math.random() * margin : bounds.w - margin + Math.random() * (margin - 100);
+
         targetRef.current = {
-          x: Math.random() * (bounds.w - 100),
+          x: targetX,
           y: window.scrollY + Math.random() * (window.innerHeight - 100),
         };
       }
