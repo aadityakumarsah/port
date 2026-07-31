@@ -696,7 +696,7 @@ export function App() {
             '--rot': leaf.rot,
           } as React.CSSProperties}
         >
-          <img src={leaf.src} alt="" className="w-6 h-6 opacity-30" />
+          <img src={leaf.src} alt="" className="w-6 h-6 opacity-15" />
         </div>
       ))}
 
