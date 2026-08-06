@@ -159,6 +159,7 @@
   padding-left: 1.1em;
   color: #6b6b6b;
   font-style: italic;
+  text-align: justify;
   margin: 1.5em 0;
 }
 .tip-canvas hr { border: none; margin: 2.5em 0; text-align: center; }
@@ -195,9 +196,31 @@
   font-style: italic;
 }
 
-/* Public article reader: keep code blocks inside the 680px column */
+/* Public article reader: diagrams get the room they need — full column width,
+   bleeding into the right margin only when wider, so graphs/arrows are never clipped */
 .article-reader .tip-canvas pre {
+  height: auto;
+  max-height: none;
   width: 100%;
   margin-left: 0;
   max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+@media (min-width: 1024px) {
+  .article-reader .tip-canvas pre {
+    width: min(1100px, calc(100vw - 268px));
+    margin-left: calc(450px - 50vw);
+    max-width: none;
+  }
+}
+.article-reader .tip-canvas pre::-webkit-scrollbar {
+  height: 8px;
+}
+.article-reader .tip-canvas pre::-webkit-scrollbar-track {
+  background: transparent;
+}
+.article-reader .tip-canvas pre::-webkit-scrollbar-thumb {
+  background: #3a3a3c;
+  border-radius: 9999px;
 }
