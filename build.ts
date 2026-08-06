@@ -1,5 +1,5 @@
 import tailwind from "bun-plugin-tailwind";
-import { rm } from "node:fs/promises";
+import { rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const outdir = path.join(process.cwd(), "dist");
@@ -14,6 +14,7 @@ const result = await Bun.build({
   minify: true,
   target: "browser",
   sourcemap: "linked",
+  env: "BUN_PUBLIC_*",
   define: {
     "process.env.NODE_ENV": JSON.stringify("production"),
   },
@@ -22,3 +23,6 @@ const result = await Bun.build({
 for (const output of result.outputs) {
   console.log(` ${path.relative(process.cwd(), output.path)}  ${(output.size / 1024).toFixed(1)} KB`);
 }
+
+// Cloudflare Pages SPA fallback: serve index.html for client-side routes (/blog, /admin)
+await writeFile(path.join(outdir, "_redirects"), "/* /index.html 200\n");
