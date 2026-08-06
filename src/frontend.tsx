@@ -10,6 +10,7 @@ import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { Blog } from "./Blog";
 import { BlogAdmin } from "./BlogAdmin";
+import "./index.css";
 
 const elem = document.getElementById("root")!;
 
