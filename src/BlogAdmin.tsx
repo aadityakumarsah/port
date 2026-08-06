@@ -18,6 +18,7 @@ export function BlogAdmin() {
   const [unlocked, setUnlocked] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [view, setView] = useState<"list" | "editor">("list");
+  const [editing, setEditing] = useState<Post | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [deleting, setDeleting] = useState<number | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -117,6 +118,7 @@ export function BlogAdmin() {
     <div className="min-h-screen bg-black text-zinc-300">
       {view === "editor" && unlocked ? (
         <Editor
+          post={editing}
           onPublished={onPublished}
           onBack={() => {
             setView("list");
@@ -176,6 +178,7 @@ export function BlogAdmin() {
               <button
                 onClick={() => {
                   setMsg(null);
+                  setEditing(null);
                   setView("editor");
                 }}
                 className="inline-flex items-center gap-2 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400 transition-colors"
@@ -218,6 +221,17 @@ export function BlogAdmin() {
                       })}
                     </p>
                   </div>
+                  <button
+                    onClick={() => {
+                      setMsg(null);
+                      setEditing(post);
+                      setView("editor");
+                    }}
+                    className="shrink-0 rounded-lg border border-zinc-800 p-2 text-zinc-500 hover:text-indigo-400 hover:border-indigo-500/50 transition-colors"
+                    title="Edit post"
+                  >
+                    <PenLine size={16} />
+                  </button>
                   <button
                     onClick={() => deletePost(post.id)}
                     disabled={deleting === post.id}

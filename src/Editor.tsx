@@ -55,6 +55,7 @@ interface Draft {
 }
 
 interface EditorProps {
+  post?: { id: number; title: string; content: string } | null;
   onPublished: () => void;
   onBack: () => void;
 }
@@ -88,8 +89,8 @@ function toVideoEmbed(url: string) {
   return null;
 }
 
-export function Editor({ onPublished, onBack }: EditorProps) {
-  const [title, setTitle] = useState(() => loadDraft().title);
+export function Editor({ post, onPublished, onBack }: EditorProps) {
+  const [title, setTitle] = useState(() => post?.title ?? loadDraft().title);
   const [status, setStatus] = useState<Status>("draft");
   const [plusPos, setPlusPos] = useState<{ x: number; y: number } | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -104,7 +105,7 @@ export function Editor({ onPublished, onBack }: EditorProps) {
   const dragCount = useRef(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const htmlRef = useRef<string>(loadDraft().html);
+  const htmlRef = useRef<string>(post?.content ?? loadDraft().html);
 
   const editorRef = useRef<ReturnType<typeof useEditor>>(null);
 
@@ -405,10 +406,10 @@ export function Editor({ onPublished, onBack }: EditorProps) {
     setStatus("publishing");
     setMsg(null);
     try {
-      const { error } = await supabase.from("posts").insert({
-        title: title.trim(),
-        content: editor.getHTML(),
-      });
+      const payload = { title: title.trim(), content: editor.getHTML() };
+      const { error } = post
+        ? await supabase.from("posts").update(payload).eq("id", post.id)
+        : await supabase.from("posts").insert(payload);
       if (error) throw new Error(error.message);
       localStorage.removeItem(DRAFT_KEY);
       htmlRef.current = "";
