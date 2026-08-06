@@ -24,6 +24,5 @@ for (const output of result.outputs) {
   console.log(` ${path.relative(process.cwd(), output.path)}  ${(output.size / 1024).toFixed(1)} KB`);
 }
 
-// Cloudflare Pages: the app now runs on Render (Bun server). Redirect the
-// static pages.dev site there so /blog and /admin work from the old URL.
-await writeFile(path.join(outdir, "_redirects"), "/* https://portfolio-api-1zcz.onrender.com/:splat 302\n");
+// Cloudflare Pages SPA fallback: serve index.html for client-side routes (/blog, /admin)
+await writeFile(path.join(outdir, "_redirects"), "/* /index.html 200\n");

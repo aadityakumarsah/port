@@ -12,11 +12,9 @@ interface Post {
   created_at: string;
 }
 
-const TOKEN_KEY = "blog_admin_token";
-
 export function BlogAdmin() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) ?? "");
   const [unlocked, setUnlocked] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const [view, setView] = useState<"list" | "editor">("list");
@@ -34,26 +32,28 @@ export function BlogAdmin() {
   }
 
   useEffect(() => {
-    if (token) {
-      setUnlocked(true);
-      refresh();
-    }
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        setUnlocked(true);
+        refresh();
+      }
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_ev, session) => {
+      setUnlocked(!!session);
+      if (session) refresh();
+    });
+    return () => sub.subscription.unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function unlock() {
+    if (!supabase) return;
     setUnlocking(true);
     setMsg(null);
     try {
-      const res = await fetch("/api/admin/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Wrong password");
-      setToken(data.token);
-      sessionStorage.setItem(TOKEN_KEY, data.token);
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (error) throw new Error(error.message);
       setUnlocked(true);
       refresh();
     } catch (err) {
@@ -64,23 +64,47 @@ export function BlogAdmin() {
   }
 
   async function deletePost(id: number) {
-    if (!confirm("Delete this post? Its images will also be removed from Cloudinary.")) return;
+    if (!supabase) return;
+    if (!confirm("Delete this post? Its images will also be removed.")) return;
     setDeleting(id);
     setMsg(null);
     try {
-      const res = await fetch(`/api/admin/posts/${id}`, {
-        method: "DELETE",
-        headers: { "x-admin-token": token },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to delete post");
-      setMsg({ ok: true, text: "Post deleted (images removed from Cloudinary)." });
+      const { data: post } = await supabase
+        .from("posts")
+        .select("content, image_url")
+        .eq("id", id)
+        .single();
+      const paths = new Set<string>();
+      const urls = [post?.image_url, ...extractImageUrls(post?.content)];
+      for (const u of urls) {
+        const p = imagePathFromUrl(u);
+        if (p) paths.add(p);
+      }
+      const { error } = await supabase.from("posts").delete().eq("id", id);
+      if (error) throw new Error(error.message);
+      for (const p of paths) {
+        await supabase.storage.from("post-images").remove([p]);
+      }
+      setMsg({ ok: true, text: "Post deleted (images removed)." });
       refresh();
     } catch (err) {
       setMsg({ ok: false, text: (err as Error).message });
     } finally {
       setDeleting(null);
     }
+  }
+
+  function extractImageUrls(html: string | null | undefined): string[] {
+    if (!html) return [];
+    return [...html.matchAll(/https:\/\/[^"'\s)>]+\/storage\/v1\/object\/public\/[^"'\s)>]+/g)].map(
+      m => m[0]
+    );
+  }
+
+  function imagePathFromUrl(url: string | null | undefined): string | null {
+    if (!url) return null;
+    const m = url.match(/\/storage\/v1\/object\/public\/post-images\/(.+)/);
+    return m ? decodeURIComponent(m[1] ?? "") : null;
   }
 
   function onPublished() {
@@ -93,7 +117,6 @@ export function BlogAdmin() {
     <div className="min-h-screen bg-black text-zinc-300">
       {view === "editor" && unlocked ? (
         <Editor
-          token={token}
           onPublished={onPublished}
           onBack={() => {
             setView("list");
@@ -117,12 +140,19 @@ export function BlogAdmin() {
               <h1 className="font-bold text-white">Admin</h1>
             </div>
             <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email"
+              autoFocus
+              className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder-zinc-600 focus:border-indigo-500 focus:outline-none mb-3"
+            />
+            <input
               type="password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               onKeyDown={e => e.key === "Enter" && unlock()}
               placeholder="Password"
-              autoFocus
               className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder-zinc-600 focus:border-indigo-500 focus:outline-none mb-3"
             />
             <button
@@ -131,7 +161,7 @@ export function BlogAdmin() {
               className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 disabled:opacity-50 transition-colors"
             >
               {unlocking && <Loader2 size={14} className="animate-spin" />}
-              Unlock
+              Sign in
             </button>
             {msg && !msg.ok && (
               <p className="mt-3 text-sm text-red-400">{msg.text}</p>
@@ -192,7 +222,7 @@ export function BlogAdmin() {
                     onClick={() => deletePost(post.id)}
                     disabled={deleting === post.id}
                     className="shrink-0 rounded-lg border border-zinc-800 p-2 text-zinc-500 hover:text-red-400 hover:border-red-500/50 transition-colors"
-                    title="Delete post and its Cloudinary images"
+                    title="Delete post and its images"
                   >
                     {deleting === post.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                   </button>

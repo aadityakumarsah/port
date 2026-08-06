@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Editor as TiptapEditor } from "@tiptap/react";
 import { NodeSelection } from "@tiptap/pm/state";
+import { supabase } from "./lib/supabase";
 import {
   AlignCenter,
   AlignLeft,
@@ -47,11 +48,9 @@ function AlignBtn({
 
 export function ImageToolbar({
   editor,
-  token,
   uploading,
 }: {
   editor: TiptapEditor | null;
-  token: string;
   uploading: boolean;
 }) {
   const [visible, setVisible] = useState(false);
@@ -228,19 +227,16 @@ export function ImageToolbar({
     setReplacing(true);
     setPanelErr(null);
     try {
-      const form = new FormData();
-      form.set("image", file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        headers: { "x-admin-token": token },
-        body: form,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      const path = `posts/${Date.now()}-${Math.random().toString(36).slice(2, 8)}${file.name
+        .replace(/[^a-zA-Z0-9._-]/g, "-")
+        .slice(-60)}`;
+      const { data, error } = await supabase!.storage.from("post-images").upload(path, file);
+      if (error) throw new Error(error.message);
+      const url = supabase!.storage.from("post-images").getPublicUrl(path).data.publicUrl;
       const current = ed.state.selection;
       if (current instanceof NodeSelection && current.node.type.name === "image") {
         const tr = ed.state.tr;
-        tr.setNodeMarkup(current.from, undefined, { ...current.node.attrs, src: data.url });
+        tr.setNodeMarkup(current.from, undefined, { ...current.node.attrs, src: url });
         tr.setMeta("addToHistory", false);
         ed.view.dispatch(tr);
       }

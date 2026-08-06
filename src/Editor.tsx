@@ -43,6 +43,7 @@ import {
   X,
 } from "lucide-react";
 import { formatSmartText, htmlToText, isDiagramText, isJsonText, isPlainPaste } from "./lib/smartPaste";
+import { supabase } from "./lib/supabase";
 import { SelectionToolbar } from "./SelectionToolbar";
 import { ImageToolbar } from "./ImageToolbar";
 
@@ -54,7 +55,6 @@ interface Draft {
 }
 
 interface EditorProps {
-  token: string;
   onPublished: () => void;
   onBack: () => void;
 }
@@ -88,7 +88,7 @@ function toVideoEmbed(url: string) {
   return null;
 }
 
-export function Editor({ token, onPublished, onBack }: EditorProps) {
+export function Editor({ onPublished, onBack }: EditorProps) {
   const [title, setTitle] = useState(() => loadDraft().title);
   const [status, setStatus] = useState<Status>("draft");
   const [plusPos, setPlusPos] = useState<{ x: number; y: number } | null>(null);
@@ -337,38 +337,40 @@ export function Editor({ token, onPublished, onBack }: EditorProps) {
 
   const canPublish = title.trim().length > 0 && !!editor && !editor.isEmpty;
 
-  const skipCloudinaryDeleteRef = useRef(false);
+  const skipImageDeleteRef = useRef(false);
+
+  function storagePathFromUrl(src: string): string | null {
+    const m = src.match(/\/storage\/v1\/object\/public\/post-images\/(.+)/);
+    return m ? decodeURIComponent(m[1] ?? "") : null;
+  }
 
   useEffect(() => {
     if (!editor) return;
     const ed = editor;
 
-    function collectCloudinarySrcs(doc: typeof ed.state.doc): Set<string> {
+    function collectStorageSrcs(doc: typeof ed.state.doc): Set<string> {
       const srcs = new Set<string>();
       doc.descendants(node => {
         if (node.type.name === "image") {
           const src = String(node.attrs.src ?? "");
-          if (src.startsWith("https://res.cloudinary.com/")) srcs.add(src);
+          if (src.includes("/storage/v1/object/public/post-images/")) srcs.add(src);
         }
         return true;
       });
       return srcs;
     }
 
-    function deleteFromCloudinary(src: string) {
-      fetch("/api/admin/delete-image", {
-        method: "POST",
-        headers: { "x-admin-token": token, "Content-Type": "application/json" },
-        body: JSON.stringify({ url: src }),
-      }).catch(() => {});
+    function deleteFromStorage(src: string) {
+      const path = storagePathFromUrl(src);
+      if (path) supabase?.storage.from("post-images").remove([path]).catch(() => {});
     }
 
     const pending = new Map<string, ReturnType<typeof setTimeout>>();
 
     const onTransaction = ({ transaction: tr }: { transaction: Transaction }) => {
-      if (!tr.docChanged || skipCloudinaryDeleteRef.current) return;
-      const before = collectCloudinarySrcs(tr.before as never);
-      const after = collectCloudinarySrcs(tr.doc as never);
+      if (!tr.docChanged || skipImageDeleteRef.current) return;
+      const before = collectStorageSrcs(tr.before as never);
+      const after = collectStorageSrcs(tr.doc as never);
       before.forEach(src => {
         if (after.has(src) || pending.has(src)) return;
         pending.set(
@@ -383,7 +385,7 @@ export function Editor({ token, onPublished, onBack }: EditorProps) {
               }
               return true;
             });
-            if (!stillPresent) deleteFromCloudinary(src);
+            if (!stillPresent) deleteFromStorage(src);
           }, 4000)
         );
       });
@@ -396,25 +398,23 @@ export function Editor({ token, onPublished, onBack }: EditorProps) {
       pending.forEach(t => clearTimeout(t));
       pending.clear();
     };
-  }, [editor, token]);
+  }, [editor]);
 
   async function publish() {
-    if (!editor) return;
+    if (!editor || !supabase) return;
     setStatus("publishing");
     setMsg(null);
     try {
-      const res = await fetch("/api/admin/posts", {
-        method: "POST",
-        headers: { "x-admin-token": token, "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title.trim(), content: editor.getHTML() }),
+      const { error } = await supabase.from("posts").insert({
+        title: title.trim(),
+        content: editor.getHTML(),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Failed to publish");
+      if (error) throw new Error(error.message);
       localStorage.removeItem(DRAFT_KEY);
       htmlRef.current = "";
-      skipCloudinaryDeleteRef.current = true;
+      skipImageDeleteRef.current = true;
       editor.commands.clearContent();
-      skipCloudinaryDeleteRef.current = false;
+      skipImageDeleteRef.current = false;
       setTitle("");
       onPublished();
     } catch (err) {
@@ -441,15 +441,12 @@ export function Editor({ token, onPublished, onBack }: EditorProps) {
         editorRef.current?.chain().focus().setImage({ src: previewUrl, alt: file.name }).run();
       }
 
-      const form = new FormData();
-      form.set("image", file);
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        headers: { "x-admin-token": token },
-        body: form,
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Upload failed");
+      const path = `posts/${Date.now()}-${Math.random().toString(36).slice(2, 8)}${file.name
+        .replace(/[^a-zA-Z0-9._-]/g, "-")
+        .slice(-60)}`;
+      const { data, error } = await supabase!.storage.from("post-images").upload(path, file);
+      if (error) throw new Error(error.message);
+      const url = supabase!.storage.from("post-images").getPublicUrl(path).data.publicUrl;
 
       const ed = editorRef.current;
       if (ed) {
@@ -465,7 +462,7 @@ export function Editor({ token, onPublished, onBack }: EditorProps) {
           const node = ed.state.doc.nodeAt(foundPos);
           if (node) {
             const tr = ed.state.tr;
-            tr.setNodeMarkup(foundPos, undefined, { ...node.attrs, src: data.url });
+            tr.setNodeMarkup(foundPos, undefined, { ...node.attrs, src: url });
             ed.view.dispatch(tr);
           }
         }
@@ -747,7 +744,7 @@ export function Editor({ token, onPublished, onBack }: EditorProps) {
 
         <div className={`relative mt-2 ${dragOver ? "rounded-xl outline-2 outline-dashed outline-indigo-400/80 outline-offset-4" : ""}`}>
           <SelectionToolbar editor={editor} />
-          <ImageToolbar editor={editor} token={token} uploading={uploading} />
+          <ImageToolbar editor={editor} uploading={uploading} />
           <EditorContent editor={editor} />
 
           {dragOver && (
