@@ -166,7 +166,14 @@
 .tip-canvas pre code .hljs-string, .tip-canvas pre code .hljs-number, .tip-canvas pre code .hljs-attr, .tip-canvas pre code .hljs-variable, .tip-canvas pre code .hljs-literal { color: #61afef; }
 .tip-canvas pre code .hljs-comment { color: #7f848e; font-style: italic; }
 .tip-canvas pre code .hljs-punctuation { color: #ffffff; }
+.tip-canvas ul { list-style: disc; }
+.tip-canvas ol { list-style: decimal; }
 .tip-canvas ul, .tip-canvas ol { padding-left: 1.6em; margin: 1em 0; }
+.tip-canvas li { margin: 0.45em 0; }
+.tip-canvas li p { margin: 0; }
+.tip-canvas ul ul { list-style: circle; }
+.tip-canvas ol ol { list-style: lower-alpha; }
+.tip-canvas ul ul ul { list-style: square; }
 .tip-canvas .is-empty::before {
   content: attr(data-placeholder);
   color: #a8a8a8;
