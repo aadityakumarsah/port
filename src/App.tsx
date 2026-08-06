@@ -1091,16 +1091,6 @@ export function App() {
                 <h2 className="text-lg font-bold text-white">Blog & Research</h2>
               </div>
               <div className="space-y-3">
-                <a href="/blog" className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-zinc-700/50 hover:border-indigo-500/50 bg-zinc-900/30 hover:bg-zinc-800/50 transition-all duration-300">
-                  <div>
-                    <h3 className="font-semibold text-zinc-200 group-hover:text-white transition-colors">All Articles</h3>
-                    <p className="text-sm text-zinc-500 mt-1">Blog posts, research notes, and write-ups</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-400 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-1">
-                    Read here
-                    <ChevronRight className="h-4 w-4" />
-                  </span>
-                </a>
                 <a href="https://medium.com/@aadityakumarsa" target="_blank" rel="noreferrer" className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-zinc-700/50 hover:border-indigo-500/50 bg-zinc-900/30 hover:bg-zinc-800/50 transition-all duration-300">
                   <div>
                     <h3 className="font-semibold text-zinc-200 group-hover:text-white transition-colors">Medium Articles</h3>
