@@ -55,7 +55,7 @@ interface Draft {
 }
 
 interface EditorProps {
-  post?: { id: number; title: string; content: string } | null;
+  post?: { id: number; title: string; content?: string | null } | null;
   onPublished: () => void;
   onBack: () => void;
 }
