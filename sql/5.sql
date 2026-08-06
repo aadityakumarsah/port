@@ -6,7 +6,7 @@ create table if not exists public.admins (
   email text primary key
 );
 insert into public.admins (email)
-values ('your-email@example.com')
+values ('aadityakumarsah259@gmail.com')
 on conflict (email) do nothing;
 
 -- Admins can create posts (needs them to be signed in via Supabase Auth)
