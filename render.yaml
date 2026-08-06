@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: port
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: bun install
+    startCommand: bun run start
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: BUN_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: BUN_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
