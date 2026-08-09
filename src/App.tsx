@@ -46,6 +46,7 @@ import githubContrib from "./public/github-contribution.png";
 import hackClubLogo from "./public/hack-club.png";
 import insforgeLogo from "./public/insforge.png";
 import fossasiaLogo from "./public/fossasia.png";
+import questionIcon from "./public/question.png";
 
 // Language & Tech Stack Imports
 import anchorLogo from "./public/language/anchor.png";
@@ -1090,28 +1091,31 @@ export function App() {
           {/* Footer Questions & Contacts */}
           <footer className="mt-16 pt-12 border-t border-zinc-800 flex flex-col gap-12 pb-16">
             <div>
-              <h2 className="text-xl font-bold uppercase tracking-widest text-white mb-6">
-                What I ask myself while building
-              </h2>
-              <div className="space-y-4 ml-3">
-                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
-                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q1</span>
+              <div className="flex items-center gap-3 mb-6">
+                <img src={questionIcon} alt="" className="h-7 w-7 rounded-md shrink-0" />
+                <h2 className="text-xl font-bold uppercase tracking-widest text-white">
+                  What I ask myself while building
+                </h2>
+              </div>
+              <div className="space-y-3">
+                <div className="group flex items-center gap-4 p-4 rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900/40 to-zinc-900/10 hover:border-indigo-500/40 hover:from-indigo-500/10 transition-all duration-300">
+                  <span className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-sm select-none transition-colors group-hover:bg-indigo-500/20 group-hover:text-indigo-300">1</span>
                   <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">What all services do you need (fe/be etc)?</span>
                 </div>
-                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
-                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q2</span>
+                <div className="group flex items-center gap-4 p-4 rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900/40 to-zinc-900/10 hover:border-indigo-500/40 hover:from-indigo-500/10 transition-all duration-300">
+                  <span className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-sm select-none transition-colors group-hover:bg-indigo-500/20 group-hover:text-indigo-300">2</span>
                   <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">What happens if a server running your agent crashes?</span>
                 </div>
-                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
-                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q3</span>
+                <div className="group flex items-center gap-4 p-4 rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900/40 to-zinc-900/10 hover:border-indigo-500/40 hover:from-indigo-500/10 transition-all duration-300">
+                  <span className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-sm select-none transition-colors group-hover:bg-indigo-500/20 group-hover:text-indigo-300">3</span>
                   <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">How would you do context management?</span>
                 </div>
-                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
-                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q4</span>
+                <div className="group flex items-center gap-4 p-4 rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900/40 to-zinc-900/10 hover:border-indigo-500/40 hover:from-indigo-500/10 transition-all duration-300">
+                  <span className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-sm select-none transition-colors group-hover:bg-indigo-500/20 group-hover:text-indigo-300">4</span>
                   <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">How would you evaluate your agent?</span>
                 </div>
-                <div className="flex gap-4 items-start p-4 rounded-lg border border-zinc-800 bg-zinc-900/20 hover:border-indigo-500/30 transition-all duration-300 group">
-                  <span className="font-bold text-indigo-400 select-none group-hover:text-indigo-300 transition-colors">Q5</span>
+                <div className="group flex items-center gap-4 p-4 rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900/40 to-zinc-900/10 hover:border-indigo-500/40 hover:from-indigo-500/10 transition-all duration-300">
+                  <span className="h-9 w-9 shrink-0 flex items-center justify-center rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-sm select-none transition-colors group-hover:bg-indigo-500/20 group-hover:text-indigo-300">5</span>
                   <span className="text-sm font-medium text-zinc-300 group-hover:text-zinc-100 transition-colors">What metrics do you observe as your app grows?</span>
                 </div>
               </div>
