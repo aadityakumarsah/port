@@ -18,7 +18,6 @@ import {
   Activity,
   ChevronRight,
   Server,
-  BookOpen,
 } from "lucide-react";
 import ycLogo from "./public/yc.png";
 import shipdLogo from "./public/shipd.png";
@@ -47,7 +46,6 @@ import githubContrib from "./public/github-contribution.png";
 import hackClubLogo from "./public/hack-club.png";
 import insforgeLogo from "./public/insforge.png";
 import fossasiaLogo from "./public/fossasia.png";
-import mediumLogo from "./public/medium.png";
 
 // Language & Tech Stack Imports
 import anchorLogo from "./public/language/anchor.png";
@@ -1085,24 +1083,6 @@ export function App() {
               </a>
             </section>
 
-            {/* Blog & Research */}
-            <section className="scroll-mt-16 md:scroll-mt-24">
-              <div className="flex items-center gap-3 mb-4">
-                <BookOpen size={20} className="text-indigo-400" />
-                <h2 className="text-lg font-bold text-white">Blog & Research</h2>
-              </div>
-              <a href="https://medium.com/@aadityakumarsa" target="_blank" rel="noreferrer" className="group flex items-center gap-3 p-3 rounded-xl border-2 border-zinc-700/50 hover:border-indigo-500/50 bg-zinc-900/30 hover:bg-zinc-800/50 transition-all duration-300">
-                <img src={mediumLogo} alt="Medium" className="h-6 w-6 rounded-md shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-semibold text-zinc-200 group-hover:text-white transition-colors text-sm">Medium Articles</h3>
-                  <p className="text-xs text-zinc-500 mt-0.5 truncate">Writing about AI engineering, systems, and what I'm learning</p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-400 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-1">
-                  Read on Medium
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </span>
-              </a>
-            </section>
 
 
           </main>
