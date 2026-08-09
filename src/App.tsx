@@ -47,6 +47,7 @@ import githubContrib from "./public/github-contribution.png";
 import hackClubLogo from "./public/hack-club.png";
 import insforgeLogo from "./public/insforge.png";
 import fossasiaLogo from "./public/fossasia.png";
+import mediumLogo from "./public/medium.png";
 
 // Language & Tech Stack Imports
 import anchorLogo from "./public/language/anchor.png";
@@ -1086,22 +1087,21 @@ export function App() {
 
             {/* Blog & Research */}
             <section className="scroll-mt-16 md:scroll-mt-24">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4">
                 <BookOpen size={20} className="text-indigo-400" />
                 <h2 className="text-lg font-bold text-white">Blog & Research</h2>
               </div>
-              <div className="space-y-3">
-                <a href="https://medium.com/@aadityakumarsa" target="_blank" rel="noreferrer" className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-zinc-700/50 hover:border-indigo-500/50 bg-zinc-900/30 hover:bg-zinc-800/50 transition-all duration-300">
-                  <div>
-                    <h3 className="font-semibold text-zinc-200 group-hover:text-white transition-colors">Medium Articles</h3>
-                    <p className="text-sm text-zinc-500 mt-1">Writing about AI engineering, systems, and what I'm learning</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-400 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-1">
-                    Read on Medium
-                    <ExternalLink className="h-4 w-4" />
-                  </span>
-                </a>
-              </div>
+              <a href="https://medium.com/@aadityakumarsa" target="_blank" rel="noreferrer" className="group flex items-center gap-3 p-3 rounded-xl border-2 border-zinc-700/50 hover:border-indigo-500/50 bg-zinc-900/30 hover:bg-zinc-800/50 transition-all duration-300">
+                <img src={mediumLogo} alt="Medium" className="h-6 w-6 rounded-md shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-zinc-200 group-hover:text-white transition-colors text-sm">Medium Articles</h3>
+                  <p className="text-xs text-zinc-500 mt-0.5 truncate">Writing about AI engineering, systems, and what I'm learning</p>
+                </div>
+                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-400 shrink-0 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-1">
+                  Read on Medium
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </span>
+              </a>
             </section>
 
 
@@ -1165,6 +1165,10 @@ export function App() {
                 <a href="https://x.com/aadityakumarsa" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
                   <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-twitter"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg>
                   <span>X</span>
+                </a>
+                <a href="https://medium.com/@aadityakumarsa" className="flex items-center gap-2 hover:text-white transition-colors" target="_blank" rel="noreferrer">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" className="lucide lucide-medium"><path d="M13.54 12a6.8 6.8 0 0 1-6.77 6.82A6.8 6.8 0 0 1 0 12a6.8 6.8 0 0 1 6.77-6.82A6.8 6.8 0 0 1 13.54 12zM20.96 12c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42zM24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12z"/></svg>
+                  <span>Medium</span>
                 </a>
               </div>
             </div>
